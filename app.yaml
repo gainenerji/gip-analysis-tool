@@ -1,0 +1,2 @@
+runtime: python311
+entrypoint: streamlit run app.py --server.enableCORS false --browser.serverAddress 0.0.0.0 --browser.gatherUsageStats false --server.port $PORTgcloud init

@@ -3,9 +3,8 @@ import numpy as np
 from datetime import date,timedelta
 import warnings
 import locale
-from gnepias import transparency as gntp
-from gnepias import epys as gnepys
 import plotly.graph_objects as go
+import requests
 
 warnings.filterwarnings("ignore")
 
@@ -55,10 +54,27 @@ day_month = st.session_state.end_date.strftime("%m")
 day_day = st.session_state.end_date.strftime("%d")
 day_contract_filter = "PH" + day_year + day_month + day_day
 
+def transparency_call(method,service,endpoint,body,response_type):
+    
+    host = "https://seffaflik.epias.com.tr/"
+    url = host + service + endpoint
 
+    headers = {
+        "Content-Type": "application/json",
+    }
+
+    response = requests.request(method, url, headers=headers, json=body)
+
+    if response_type == "json":
+        return response.json()
+    elif response_type == "raw":
+        return response
+    elif response_type == "dataframe":
+        return pd.DataFrame(response.json()["items"])
+    
 @st.cache_data
 def get_history(start_date, end_date):
-    gip_history_call = gntp.transparency_call(
+    gip_history_call = transparency_call(
         method = "POST",
         service = "electricity-service",
         endpoint = "/v1/markets/idm/data/transaction-history",
